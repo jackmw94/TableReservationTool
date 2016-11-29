@@ -2,11 +2,18 @@ var data = "{  \"name\":\"Kunwar's Grill\",  \"rating\":5,  \"price\":2,  \"dist
 var restaurantsJSON = data.split("~");
 var restaurants = [];
 var searchedRestaurants = [];
+var filteredRestaurants = [];
+
 var sortBy = 'alphabetical';
+var maxDistance = 50;
+var priceMin = 1;
+var priceMax = 5;
+var minRating = 1;
+
 for (i = 0; i < restaurantsJSON.length; i++){
-	//console.log("JSON.parse(restaurantsJSON[i=" + i + "]).name = " + JSON.parse(restaurantsJSON[i]).name);
 	restaurants.push(JSON.parse(restaurantsJSON[i]));
 }
+
 
 function searchName(search){
 	var result = [];
@@ -19,32 +26,32 @@ function searchName(search){
 	return result;
 }
 
-function filterDistance(distance){
+function filterDistance(distance, restaurants){
 	distance = parseInt(distance);
 	var result = [];
-	for (i = 0; i < searchedRestaurants.length; i++){
-		if (searchedRestaurants[i].distance <= distance){
-			result.push(searchedRestaurants[i]);
+	for (i = 0; i < restaurants.length; i++){
+		if (restaurants[i].distance <= distance){
+			result.push(restaurants[i]);
 		}
 	}
 	return result;
 }
 
-function filterPrice(min,max){
+function filterPrice(min,max,restaurants){
 	var result = [];
-	for (i = 0; i < searchedRestaurants.length; i++){
-		if (searchedRestaurants[i].price <= max && searchedRestaurants[i].price >= min){
-			result.push(searchedRestaurants[i]);
+	for (i = 0; i < restaurants.length; i++){
+		if (restaurants[i].price <= max && restaurants[i].price >= min){
+			result.push(restaurants[i]);
 		}
 	}
 	return result;
 }
 
-function filterRating(min){
+function filterRating(min,restaurants){
 	var result = [];
-	for (i = 0; i < searchedRestaurants.length; i++){
-		if (searchedRestaurants[i].rating >= min){
-			result.push(searchedRestaurants[i]);
+	for (i = 0; i < restaurants.length; i++){
+		if (restaurants[i].rating >= min){
+			result.push(restaurants[i]);
 		}
 	}
 	return result;
@@ -67,15 +74,46 @@ function generateSearchItem(restaurant){
 	return result;
 }
 
+function updateFilter(type,value){
+	if (type === 'distance'){
+		maxDistance = value;
+	}else if (type === 'price'){
+		priceMin = value[0];
+		priceMax = value[1];
+	}else if (type === 'rating'){
+		minRating = value;
+	}
+	setSearchResults(runAllFilters(searchedRestaurants));
+}
+
+function runAllFilters(restaurants){
+	restaurants = filterDistance(maxDistance,restaurants);
+	restaurants = filterPrice(priceMin, priceMax,restaurants);
+	restaurants = filterRating(minRating,restaurants);
+	return restaurants;
+}
+
+function keepSort(restaurants){
+	if (sortBy === 'alphabetical'){
+		restaurants = sortByAlphabetical(restaurants);
+	}else if (sortBy === 'closest'){
+		restaurants = sortByDistance(restaurants);
+	}else if (sortBy === 'rating'){
+		restaurants = sortByRating(restaurants);
+	}
+	return restaurants;
+}
+
 function generateMultipleSearchItems(restaurants){
 	var result = "";
+	if (!restaurants) return result;
 	for (i = 0; i < restaurants.length; i++){
 		result = result + generateSearchItem(restaurants[i]);
 	}
 	return result;
 }
 
-function restaurantsToNames(restaurants){
+function restaurantsToNames(restaurants){ //debugging only
 	var result = "";
 	if (restaurants.length > 0) result = restaurants[0].name;
 	for (i = 1; i < restaurants.length; i++){
@@ -86,38 +124,23 @@ function restaurantsToNames(restaurants){
 }
 
 function setSearchResults(restaurants){
-	if (sortBy === 'alphabetical'){
-		restaurants = sortByAlphabetical(restaurants);
-	}else if (sortBy === 'closest'){
-		restaurants = sortByDistance(restaurants);
-	}else if (sortBy === 'rating'){
-		restaurants = sortByRating(restaurants);
-	}else{
-		alert("can't sort by that!");
-	}
 	filteredRestaurants = restaurants;
-	document.getElementById("searchResults").innerHTML = generateMultipleSearchItems(restaurants);
+	document.getElementById("searchResults").innerHTML = generateMultipleSearchItems(keepSort(restaurants));
 }
 
-function changeSort(type){
+function changeSort(type){ //used when you click the sort buttons
 	sortBy = type;
 	if (type === 'alphabetical'){
-		setSearchResults(sortByAlphabetical(searchedRestaurants));
+		setSearchResults(sortByAlphabetical(filteredRestaurants));
 	}else if (type === 'closest'){
-		setSearchResults(sortByDistance(searchedRestaurants));
+		setSearchResults(sortByDistance(filteredRestaurants));
 	}else if (type === 'rating'){
-		setSearchResults(sortByRating(searchedRestaurants));
-	}else{
-		alert("can't sort by that!");
+		setSearchResults(sortByRating(filteredRestaurants));
 	}
-}
-
-function keepSort(){
-	changeSort(sortBy);
 }
 
 function sortByAlphabetical(restaurants){
-	if (restaurants.length === 0) return;
+	if (!restaurants) return;
 	var byName = restaurants.slice(0);
 	byName.sort(function(a,b) {
 		var x = a.name.toLowerCase();
@@ -128,7 +151,7 @@ function sortByAlphabetical(restaurants){
 }
 
 function sortByDistance(restaurants){
-	if (restaurants.length === 0) return;
+	if (!restaurants) return;
 	var byDistance = restaurants.slice(0);
 	byDistance.sort(function(a,b) {
 		return a.distance - b.distance;
@@ -137,10 +160,22 @@ function sortByDistance(restaurants){
 }
 
 function sortByRating(restaurants){
-	if (restaurants.length === 0) return;
+	if (!restaurants) return;
 	var byRating = restaurants.slice(0);
 	byRating.sort(function(a,b) {
 		return b.rating - a.rating;
 	});
 	return byRating;
+}
+
+function getQueryString(search_for) {
+	var query = window.location.search.substring(1);
+	var parms = query.split('&');
+	for (var i=0; i<parms.length; i++) {
+		var pos = parms[i].indexOf('=');
+		if (pos > 0  && search_for == parms[i].substring(0,pos)) {
+			return parms[i].substring(pos+1);;
+		}
+	}
+	return "";
 }

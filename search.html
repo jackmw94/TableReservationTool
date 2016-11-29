@@ -4,7 +4,7 @@
         <meta charset="utf-8">
         <title>Independent CSS scrolling panels (with inertia)</title>
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <link rel="stylesheet" href="example_scrolling.css">
+        <link rel="stylesheet" href="css/search.css">
         <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
 		<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
   		<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
@@ -18,7 +18,7 @@
 					values: [ 1, 5 ],
 					slide: function( event, ui ) {
 						$( "#amount" ).val( "£" + ui.values[ 0 ] + " - £" + ui.values[ 1 ] );
-						 setSearchResults(filterPrice(ui.values[0],ui.values[1]));
+						updateFilter('price',[ui.values[0],ui.values[1]]);
 					}
       			});
     			$( "#amount" ).val( "£" + $( "#slider-range" ).slider( "values", 0 ) +
@@ -26,13 +26,13 @@
   			} );
   		</script>
     </head>
-    <body>
+    <body onload="var queryString = getQueryString('name_search'); if (queryString){ setSearchResults(searchName(queryString)); document.getElementById('name_search').value=queryString;}">
     <div class="Top">Table Booking Tool</div>
     <div class="Container">
         <div class="Left" id="left">
         	<p>
         	<input name="name_search" id="name_search" onfocus="if (this.value=='Search by name:') this.value = ''" type="text" value="Search by name:">
-			<input name="name_go" type="submit" value="Go" onclick="setSearchResults(searchName(getElementById('name_search').value));">
+			<input name="name_go" type="submit" value="Go" onclick="setSearchResults(runAllFilters(searchName(getElementById('name_search').value)));">
 			</p>
 			
 			<hr>
@@ -47,11 +47,11 @@
 			<br>
 						
 			<p>Maximum distance:<br>
-			<input type="radio" name="distance" onclick="setSearchResults(filterDistance(this.value))" value="2">2 miles<br>
-			<input type="radio" name="distance" onclick="setSearchResults(filterDistance(this.value))" value="5" checked>5 miles<br>
-			<input type="radio" name="distance" onclick="setSearchResults(filterDistance(this.value))" value="10">10 miles<br>
-			<input type="radio" name="distance" onclick="setSearchResults(filterDistance(this.value))" value="20">20 miles<br>
-			<input type="radio" name="distance" onclick="setSearchResults(filterDistance(this.value))" value="50">50 miles<br>
+			<input type="radio" name="distance" onclick="updateFilter('distance',this.value)" value="2">2 miles<br>
+			<input type="radio" name="distance" onclick="updateFilter('distance',this.value)" value="5">5 miles<br>
+			<input type="radio" name="distance" onclick="updateFilter('distance',this.value)" value="10">10 miles<br>
+			<input type="radio" name="distance" onclick="updateFilter('distance',this.value)" value="20">20 miles<br>
+			<input type="radio" name="distance" onclick="updateFilter('distance',this.value)" value="50" checked>50 miles<br>
 			</p>
 			
 			<br>
@@ -67,7 +67,7 @@
 			<p>
 				<label for="rating">Minimum rating:</label>
 				<input type="text" id="rating" readonly style="border:0; color:white; background-color:rgba(255, 255, 255, 0.3); font-weight:bold;" value="1 star">
-				<input type="range" name="range" value="1" min="1" max="5" onchange="document.getElementById('rating').value=this.value + ' star';setSearchResults(filterRating(this.value));">
+				<input type="range" name="range" value="1" min="1" max="5" onchange="document.getElementById('rating').value=this.value + ' star';updateFilter('rating',this.value);">
 			</p>
         </div>
         <div class="Middle" id="searchResults">
