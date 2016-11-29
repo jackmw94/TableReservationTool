@@ -26,13 +26,13 @@
   			} );
   		</script>
     </head>
-    <body onload="var queryString = getQueryString('name_search'); if (queryString){ setSearchResults(searchName(queryString)); document.getElementById('name_search').value=queryString;}">
+    <body onload="var queryString = getQueryString('name_search'); if (queryString === 'Search+by+name%3A'){ queryString = '';} setSearchResults(runAllFilters(searchName(queryString))); document.getElementById('name_search').value=queryString;">
     <div class="Top">Table Booking Tool</div>
     <div class="Container">
         <div class="Left" id="left">
         	<p>
         	<input name="name_search" id="name_search" onfocus="if (this.value=='Search by name:') this.value = ''" type="text" value="Search by name:">
-			<input name="name_go" type="submit" value="Go" onclick="setSearchResults(runAllFilters(searchName(getElementById('name_search').value)));">
+			<input name="name_go" type="submit" value="Go" onclick="setSearchResults(runAllFilters(searchName(document.getElementById('name_search').value)));">
 			</p>
 			
 			<hr>
