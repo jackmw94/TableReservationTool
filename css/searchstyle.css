@@ -1,0 +1,76 @@
+* {
+	box-sizing: border-box;
+}
+
+html {
+	height:100vh;
+	overflow:hidden;
+}
+body {
+    background: black url("bg.jpg") no-repeat fixed center;
+    background-size: cover;
+    --website-font: "Trebuchet MS", Helvetica, sans-serif;
+    --title-colour:white;
+    --title-size: 40px;
+    --input-text-size: 20px;
+    
+	font-family: var(--website-font);
+	color: var(--title-colour);
+}
+
+table {
+	width:100%;
+	
+
+	/*border: 1px solid black;*/
+}
+
+th {
+	height:10%;
+	width:100%;
+	padding:10px;
+	background: white;
+	background-color:rgba(255, 255, 255, 0.2);
+	
+	font-size: var(--title-size);
+    colspan:"2";
+	width:100%;
+	vertical-align: bottom;
+}
+
+td.filters {
+	vertical-align: top;
+	padding:30px;
+	width:30%;
+	height:100%;
+	background-color:rgba(255, 255, 255, 0.2);
+	/*border: 1px solid black;*/
+}
+td.main_data {
+	width:70%;
+	height:100%;
+	padding:30px;
+	text-align:left;
+	vertical-align: top;
+	border: 1px solid black;
+}
+
+table.search_results {
+	background-color:rgba(255, 255, 255, 0.2);
+	width:100%;
+	height:100%;
+	overflow: scroll;
+	-webkit-overflow-scrolling: touch;
+    -ms-overflow-style: none;
+}
+	
+div.search_results {
+	overflow: scroll;
+	-webkit-overflow-scrolling: touch;
+    -ms-overflow-style: none;
+}
+
+tr.result_item {
+	height: 100px;
+	min-height: 100px;
+}
